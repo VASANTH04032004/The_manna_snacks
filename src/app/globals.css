@@ -1,26 +1,374 @@
 @import "tailwindcss";
 
+/* ============================================================
+   THE MANNA SNACKS — Design System Tokens (Tailwind v4)
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ---- Palette ---- */
+  --color-cream: #F7F1E3;
+  --color-charcoal: #2B2620;
+  --color-wheat: #D9A857;
+  --color-terracotta: #C46B4B;
+  --color-olive: #5C6B4A;
+  --color-gold: #E3A62F;
+  --color-cream-dark: #EDE5D3;
+  --color-charcoal-light: #4A4035;
+
+  /* ---- Typography ---- */
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-body: "Inter", "system-ui", sans-serif;
+
+  /* ---- Motion ---- */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-slow: 700ms;
+  --duration-medium: 450ms;
+  --duration-fast: 250ms;
+
+  /* ---- Layout ---- */
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --max-width: 1400px;
+
+  /* ---- Grain ---- */
+  --grain-opacity: 0.035;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Colors */
+  --color-cream: var(--color-cream);
+  --color-charcoal: var(--color-charcoal);
+  --color-wheat: var(--color-wheat);
+  --color-terracotta: var(--color-terracotta);
+  --color-olive: var(--color-olive);
+  --color-gold: var(--color-gold);
+  --color-cream-dark: var(--color-cream-dark);
+  --color-charcoal-light: var(--color-charcoal-light);
+
+  /* Fonts */
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+
+  /* Easing */
+  --ease-premium: var(--ease-premium);
+
+  /* Animation durations */
+  --animate-duration-slow: var(--duration-slow);
+  --animate-duration-medium: var(--duration-medium);
+  --animate-duration-fast: var(--duration-fast);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background-color: var(--color-cream);
+  color: var(--color-charcoal);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
 }
+
+::selection {
+  background-color: var(--color-wheat);
+  color: var(--color-charcoal);
+}
+
+/* ============================================================
+   TYPOGRAPHY — Editorial Rhythm
+   ============================================================ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--color-charcoal);
+}
+
+h1 { font-size: clamp(2.5rem, 6vw, 5.5rem); }
+h2 { font-size: clamp(2rem, 4.5vw, 3.75rem); }
+h3 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
+h4 { font-size: clamp(1.25rem, 2vw, 1.5rem); }
+
+p {
+  max-width: 65ch;
+  line-height: 1.8;
+}
+
+/* Small-caps label style */
+.label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-charcoal-light);
+}
+
+.label-gold {
+  color: var(--color-gold);
+}
+
+/* ============================================================
+   LAYOUT — Editorial Grid
+   ============================================================ */
+
+.container-editorial {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section-spacing {
+  padding-block: clamp(4rem, 10vh, 8rem);
+}
+
+/* Hairline dividers — the signature of editorial layout */
+.hairline {
+  border: none;
+  height: 1px;
+  background: var(--color-charcoal);
+  opacity: 0.12;
+  margin: 0;
+}
+
+/* ============================================================
+   GRAIN TEXTURE OVERLAY
+   ============================================================ */
+
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  mix-blend-mode: multiply;
+}
+
+/* ============================================================
+   CUSTOM CURSOR (Desktop only)
+   ============================================================ */
+
+@media (hover: hover) and (pointer: fine) {
+  .custom-cursor-active,
+  .custom-cursor-active * {
+    cursor: none !important;
+  }
+}
+
+/* ============================================================
+   ORGANIC BLOB MASKS
+   ============================================================ */
+
+.blob-mask-3 {
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+
+/* ============================================================
+   BUTTONS — Premium Magnetic Style
+   ============================================================ */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2.25rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-cream);
+  background: var(--color-charcoal);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--duration-medium) var(--ease-premium);
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--duration-medium) var(--ease-premium);
+  z-index: 0;
+}
+
+.btn-primary:hover::after {
+  transform: scaleX(1);
+}
+
+.btn-primary span {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2.25rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-charcoal);
+  background: transparent;
+  border: 1px solid var(--color-charcoal);
+  border-radius: 0;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--duration-medium) var(--ease-premium);
+}
+
+.btn-outline:hover {
+  color: var(--color-cream);
+  background: var(--color-charcoal);
+}
+
+/* ============================================================
+   FOCUS STATES — Styled to match aesthetic
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ============================================================
+   FLOATING LABEL INPUTS
+   ============================================================ */
+
+.floating-field {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.floating-field input,
+.floating-field textarea {
+  width: 100%;
+  padding: 1.5rem 0 0.5rem 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-charcoal);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(43, 38, 32, 0.2);
+  transition: border-color var(--duration-fast) var(--ease-premium);
+}
+
+.floating-field input:focus,
+.floating-field textarea:focus {
+  outline: none;
+  border-bottom-color: var(--color-gold);
+}
+
+.floating-field label {
+  position: absolute;
+  top: 1.25rem;
+  left: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-charcoal-light);
+  pointer-events: none;
+  transition: all var(--duration-fast) var(--ease-premium);
+}
+
+.floating-field input:focus ~ label,
+.floating-field input:not(:placeholder-shown) ~ label,
+.floating-field textarea:focus ~ label,
+.floating-field textarea:not(:placeholder-shown) ~ label {
+  top: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+/* ============================================================
+   SCROLLBAR — Minimal
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-charcoal);
+  opacity: 0.3;
+  border-radius: 3px;
+}
+
+/* ============================================================
+   PREFERS-REDUCED-MOTION — Graceful Fallback
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .grain-overlay {
+    display: none;
+  }
+}
+
+/* ============================================================
+   UTILITY ANIMATIONS
+   ============================================================ */
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient { animation: gradient-shift 8s ease infinite; background-size: 200% 200%; }
