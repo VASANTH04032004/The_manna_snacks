@@ -31,11 +31,21 @@ export default function CartDrawer() {
   }, [isCartOpen]);
 
   const getWhatsAppLink = () => {
+    let totalKg = 0;
     const itemList = items
-      .map((item, index) => `${index + 1}. *${item.product.name}* (Qty: ${item.quantity}) - ₹${item.product.price.retail * item.quantity}`)
+      .map((item, index) => {
+        if (item.orderMode === 'kg') {
+          totalKg += (item.kgAmount || 0);
+          return `${index + 1}. *${item.product.name}* (Qty: ${item.kgAmount} KG) - ₹${item.product.price.retail * item.quantity}`;
+        }
+        return `${index + 1}. *${item.product.name}* (Qty: ${item.quantity} Packs) - ₹${item.product.price.retail * item.quantity}`;
+      })
       .join('\n');
     
-    const message = `*Hello The Manna Snacks / Vel Brothers!* 👋\n\nI would like to order / negotiate price for the following items:\n\n${itemList}\n\n*Estimated Total:* ₹${totalPrice()}\n*Total Items:* ${items.reduce((sum, item) => sum + item.quantity, 0)} pcs\n\nPlease let me know the best discounted price and delivery details.\n\n*My Details:*\nName:\nDelivery Location:`;
+    const isWholesale = totalPrice() >= 2000 || totalKg >= 10 || items.some(i => i.orderMode !== 'kg' && i.quantity >= 20);
+    const orderType = isWholesale ? "Wholesale/Bulk Order" : "Retail Order";
+
+    const message = `*Hello The Manna Snacks / Vel Brothers!* 👋\n\nI would like to place a *${orderType}* for the following items:\n\n${itemList}\n\n*Estimated Total:* ₹${totalPrice()}\n*Total Items:* ${items.reduce((sum, item) => sum + item.quantity, 0)} units\n\nPlease let me know the best discounted price and delivery details.\n\n*My Details:*\nName:\nDelivery Location:`;
     
     return `https://wa.me/917402222232?text=${encodeURIComponent(message)}`;
   };
@@ -190,7 +200,7 @@ export default function CartDrawer() {
                 /* --- STANDARD ITEMS LIST SCREEN --- */
                 <div className="space-y-6">
                   {items.map((item) => (
-                    <div key={item.product.id} className="flex gap-4 p-3 rounded-2xl bg-[var(--color-cream-dark)]/50 border border-[var(--color-charcoal-light)]">
+                    <div key={`${item.product.id}-${item.orderMode || 'pack'}`} className="flex gap-4 p-3 rounded-2xl bg-[var(--color-cream-dark)]/50 border border-[var(--color-charcoal-light)]">
                       <div className="relative w-20 h-20 bg-[var(--color-cream)] rounded-xl overflow-hidden shrink-0">
                         {item.product.image && (
                           <Image
@@ -206,7 +216,7 @@ export default function CartDrawer() {
                         <div className="flex justify-between items-start mb-1">
                           <h3 className="font-medium text-[var(--color-charcoal)] line-clamp-1 text-sm">{item.product.name}</h3>
                           <button 
-                            onClick={() => removeItem(item.product.id)}
+                            onClick={() => removeItem(item.product.id, item.orderMode)}
                             className="text-[var(--color-charcoal)] opacity-40 hover:opacity-100 transition-opacity p-1"
                             aria-label="Remove item"
                           >
@@ -217,28 +227,31 @@ export default function CartDrawer() {
                         </div>
                         
                         <div className="text-[var(--color-charcoal)] font-semibold text-sm mb-auto">
-                          ₹{item.product.price.retail * item.quantity} <span className="text-xs font-normal opacity-60">({item.quantity} × ₹{item.product.price.retail})</span>
+                          ₹{item.product.price.retail * item.quantity} <span className="text-xs font-normal opacity-60">({item.orderMode === 'kg' ? `${item.kgAmount} KG` : `${item.quantity} Packs`})</span>
                         </div>
                         
-                        <div className="flex items-center gap-3 mt-2">
-                          <div className="flex items-center border border-[var(--color-charcoal-light)] rounded-full bg-[var(--color-cream)]">
-                            <button 
-                              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                              className="w-7 h-7 flex items-center justify-center text-[var(--color-charcoal)] hover:bg-[var(--color-charcoal-light)] rounded-l-full font-bold"
-                              aria-label="Decrease quantity"
-                            >
-                              -
-                            </button>
-                            <span className="w-7 text-center text-xs font-bold">{item.quantity}</span>
-                            <button 
-                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                              className="w-7 h-7 flex items-center justify-center text-[var(--color-charcoal)] hover:bg-[var(--color-charcoal-light)] rounded-r-full font-bold"
-                              aria-label="Increase quantity"
-                            >
-                              +
-                            </button>
+                          <div className="flex items-center gap-3 mt-2">
+                            <div className="flex items-center border border-[var(--color-charcoal-light)] rounded-full bg-[var(--color-cream)]">
+                              <button 
+                                onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.orderMode)}
+                                className="w-7 h-7 flex items-center justify-center text-[var(--color-charcoal)] hover:bg-[var(--color-charcoal-light)] rounded-l-full font-bold"
+                                aria-label="Decrease quantity"
+                              >
+                                -
+                              </button>
+                              <span className="w-7 text-center text-xs font-bold">{item.quantity}</span>
+                              <button 
+                                onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.orderMode)}
+                                className="w-7 h-7 flex items-center justify-center text-[var(--color-charcoal)] hover:bg-[var(--color-charcoal-light)] rounded-r-full font-bold"
+                                aria-label="Increase quantity"
+                              >
+                                +
+                              </button>
+                            </div>
+                            {item.orderMode === 'kg' && (
+                              <span className="text-xs text-[var(--color-terracotta)] font-medium">Pack Qty</span>
+                            )}
                           </div>
-                        </div>
                       </div>
                     </div>
                   ))}

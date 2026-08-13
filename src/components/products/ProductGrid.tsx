@@ -6,6 +6,7 @@ import { ProductCard } from './ProductCard';
 
 interface ProductGridProps {
   products: Product[];
+  onSelectProduct?: (product: Product) => void;
 }
 
 const containerVariants: Variants = {
@@ -24,7 +25,7 @@ const itemVariants: Variants = {
   exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } }
 };
 
-export function ProductGrid({ products }: ProductGridProps) {
+export function ProductGrid({ products, onSelectProduct }: ProductGridProps) {
   return (
     <motion.div layout className="min-h-[50vh]">
       <motion.div
@@ -44,7 +45,7 @@ export function ProductGrid({ products }: ProductGridProps) {
               exit="exit"
               className="w-full h-full"
             >
-              <ProductCard product={product} />
+              <ProductCard product={product} onSelect={onSelectProduct} />
             </motion.div>
           ))}
         </AnimatePresence>

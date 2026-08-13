@@ -10,9 +10,9 @@ interface CartState {
   quickViewProduct: Product | null;
 
   // Actions
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (product: Product, quantity?: number, orderMode?: 'pack' | 'kg', kgAmount?: number) => void;
+  removeItem: (productId: string, orderMode?: 'pack' | 'kg') => void;
+  updateQuantity: (productId: string, quantity: number, orderMode?: 'pack' | 'kg') => void;
   clearCart: () => void;
   toggleCart: () => void;
   openCart: () => void;
@@ -31,38 +31,43 @@ export const useCartStore = create<CartState>((set, get) => ({
   isQuickViewOpen: false,
   quickViewProduct: null,
 
-  addItem: (product, quantity = 1) => {
+  addItem: (product, quantity = 1, orderMode = 'pack', kgAmount) => {
     set((state) => {
+      // Find matching item by ID and orderMode
       const existing = state.items.find(
-        (item) => item.product.id === product.id
+        (item) => item.product.id === product.id && (item.orderMode || 'pack') === orderMode
       );
       if (existing) {
         return {
           items: state.items.map((item) =>
-            item.product.id === product.id
-              ? { ...item, quantity: item.quantity + quantity }
+            item.product.id === product.id && (item.orderMode || 'pack') === orderMode
+              ? { 
+                  ...item, 
+                  quantity: item.quantity + quantity,
+                  kgAmount: item.kgAmount && kgAmount ? item.kgAmount + kgAmount : undefined
+                }
               : item
           ),
         };
       }
-      return { items: [...state.items, { product, quantity }] };
+      return { items: [...state.items, { product, quantity, orderMode, kgAmount }] };
     });
   },
 
-  removeItem: (productId) => {
+  removeItem: (productId, orderMode = 'pack') => {
     set((state) => ({
-      items: state.items.filter((item) => item.product.id !== productId),
+      items: state.items.filter((item) => !(item.product.id === productId && (item.orderMode || 'pack') === orderMode)),
     }));
   },
 
-  updateQuantity: (productId, quantity) => {
+  updateQuantity: (productId, quantity, orderMode = 'pack') => {
     if (quantity <= 0) {
-      get().removeItem(productId);
+      get().removeItem(productId, orderMode);
       return;
     }
     set((state) => ({
       items: state.items.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
+        item.product.id === productId && (item.orderMode || 'pack') === orderMode ? { ...item, quantity } : item
       ),
     }));
   },
@@ -76,7 +81,7 @@ export const useCartStore = create<CartState>((set, get) => ({
   closeQuickView: () =>
     set({ isQuickViewOpen: false, quickViewProduct: null }),
 
-  totalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
+  totalItems: () => get().items.length,
   totalPrice: () =>
     get().items.reduce(
       (sum, item) => sum + item.product.price.retail * item.quantity,

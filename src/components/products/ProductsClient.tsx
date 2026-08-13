@@ -5,6 +5,7 @@ import { Product } from '@/types/product';
 import { filterByCategory } from '@/lib/categories';
 import { CategoryFilter } from './CategoryFilter';
 import { ProductGrid } from './ProductGrid';
+import ProductModal from './ProductModal';
 import KineticText from '@/components/ui/KineticText';
 import { motion, LayoutGroup } from 'framer-motion';
 
@@ -14,6 +15,7 @@ interface ProductsClientProps {
 
 export function ProductsClient({ products }: ProductsClientProps) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const filteredProducts = activeCategory
     ? filterByCategory(products, activeCategory)
@@ -34,7 +36,7 @@ export function ProductsClient({ products }: ProductsClientProps) {
           transition={{ delay: 0.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-lg opacity-60 max-w-xl"
         >
-          Discover our range of authentic, traditional snacks made with the finest ingredients and time-honored recipes.
+          Discover our range of authentic, traditional snacks made with the finest ingredients. Click any snack to select required KG and order directly via WhatsApp!
         </motion.p>
       </div>
 
@@ -45,9 +47,19 @@ export function ProductsClient({ products }: ProductsClientProps) {
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
           />
-          <ProductGrid products={filteredProducts} />
+          <ProductGrid
+            products={filteredProducts}
+            onSelectProduct={(product) => setSelectedProduct(product)}
+          />
         </LayoutGroup>
       </div>
+
+      {/* Product Details & KG Quantity Selection Modal */}
+      <ProductModal
+        product={selectedProduct}
+        isOpen={!!selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+      />
     </div>
   );
 }

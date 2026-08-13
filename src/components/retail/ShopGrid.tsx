@@ -4,17 +4,17 @@ import { useState } from 'react';
 import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 import { products } from '@/data/products';
+import { Product } from '@/types/product';
 import { useCartStore } from '@/store';
 import { useDeviceCapability } from '@/hooks/useDeviceCapability';
 import MagneticButton from '@/components/ui/MagneticButton';
-
 
 const gridVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.08,
     },
   },
 };
@@ -33,8 +33,8 @@ export default function ShopGrid() {
   const { prefersReducedMotion } = useDeviceCapability();
   const [addedId, setAddedId] = useState<string | null>(null);
 
-  const handleAddToCart = (product: typeof products[0]) => {
-    addItem(product, 1);
+  const handleAddToCart = (product: Product) => {
+    addItem(product, 1, 'pack');
     setAddedId(product.id);
     setTimeout(() => {
       setAddedId((current) => (current === product.id ? null : current));
@@ -55,9 +55,8 @@ export default function ShopGrid() {
           variants={!prefersReducedMotion ? cardVariants : undefined}
           className="group flex flex-col"
         >
-          <div className="relative aspect-[4/5] bg-[var(--color-cream-dark)] rounded-2xl overflow-hidden mb-4">
-            {/* Fallback color/shape if images aren't present */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-wheat)] to-[var(--color-cream)] opacity-20"></div>
+          <div className="relative aspect-[4/5] bg-[var(--color-cream-dark)] rounded-2xl overflow-hidden mb-4 shadow-sm group-hover:shadow-xl transition-shadow duration-500">
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-wheat)] to-[var(--color-cream)] opacity-20" />
             
             <div className="absolute inset-0 flex items-center justify-center p-8 transition-transform duration-700 ease-out group-hover:scale-105">
               <div className="w-full h-full relative">
@@ -70,13 +69,13 @@ export default function ShopGrid() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 ) : (
-                  <div className="w-full h-full bg-[var(--color-charcoal-light)] rounded-xl opacity-20"></div>
+                  <div className="w-full h-full bg-[var(--color-charcoal-light)] rounded-xl opacity-20" />
                 )}
               </div>
             </div>
             
             {product.badges && product.badges.length > 0 && (
-              <div className="absolute top-4 left-4 flex flex-col gap-2">
+              <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                 {product.badges.slice(0, 1).map((badge, idx) => (
                   <span key={idx} className="px-3 py-1 bg-[var(--color-cream)] text-[var(--color-charcoal)] text-xs uppercase tracking-wider rounded-full font-medium shadow-sm">
                     {badge}
@@ -103,7 +102,10 @@ export default function ShopGrid() {
               </span>
               
               <MagneticButton
-                onClick={() => handleAddToCart(product)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAddToCart(product);
+                }}
                 variant="custom"
                 className={`h-10 px-4 rounded-full flex items-center justify-center gap-1.5 transition-all duration-300 font-medium text-xs tracking-wider uppercase ${
                   addedId === product.id
@@ -124,7 +126,7 @@ export default function ShopGrid() {
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    <span>Add</span>
+                    <span>Add Pack</span>
                   </>
                 )}
               </MagneticButton>

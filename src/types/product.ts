@@ -30,7 +30,9 @@ export interface Product {
 
 export interface CartItem {
   product: Product;
-  quantity: number;
+  quantity: number; // always stores pack quantity
+  orderMode?: 'pack' | 'kg';
+  kgAmount?: number;
 }
 
 export interface WholesaleInquiryItem {
